@@ -44,7 +44,7 @@ app.post('/upload', upload.single('product'), (req, res) => {
 // Product Schema
 const productSchema = new mongoose.Schema({
   id: { type: Number, required: true },
-  name: { type: String, required: true },
+  name: { type: String, required: true},
   image: { type: String, required: true },
   category: { type: String, required: true },
   new_price: { type: Number, required: true },
@@ -106,14 +106,17 @@ app.get('/allproducts',async(req,res)=>
 const Users=mongoose.model('Users',{
   name:{
     type:String,
+    required:true,
   },
   email:
   {
     type:String,
+    required:true,
     unique:true,    
   },
   password:
   {
+    required:true,
     type:String,
   },
   cartData:
@@ -132,7 +135,23 @@ const Users=mongoose.model('Users',{
 
 app.post('/signup',async(req,res)=>
 {
-  let check=await Users.findOne({email:req.body.email});
+
+  const {username,email,password}=req.body;
+
+  if(!username)
+  {
+    return res.status(400).json({ error: "Username is required." });
+  }
+  if(!email)
+  {
+    return res.status(400).json({ error: "email is required." });
+  }
+  if(!password)
+  {
+    return res.status(400).json({ error: "password is required." });
+  }
+
+  let check=await Users.findOne({email:email});
   if (check) 
   {
     return res.status(400).json({success:false,errors:"existing user found with same email address "})
@@ -142,9 +161,9 @@ app.post('/signup',async(req,res)=>
     cart[i]=0;
   }
   const user =new Users({
-    name:req.body.username,
-    email:req.body.email,
-    password:req.body.password,
+    name:username,
+    email:email,
+    password:password,
     cartData:cart
   })
 
